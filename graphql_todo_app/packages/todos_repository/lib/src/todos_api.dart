@@ -11,5 +11,3 @@ abstract class TodosApi {
 
   Future<void> deleteTodo(String id);
 }
-
-class TodoNotFoundException implements Exception {}

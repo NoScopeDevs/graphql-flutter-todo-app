@@ -2,4 +2,5 @@
 library todos_repository;
 
 export 'src/model/model.dart';
+export 'src/todos_api.dart';
 export 'src/todos_repository.dart';

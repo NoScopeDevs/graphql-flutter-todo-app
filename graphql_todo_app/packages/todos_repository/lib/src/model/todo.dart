@@ -6,12 +6,12 @@ part 'todo.g.dart';
 @JsonSerializable()
 class Todo extends Equatable {
   const Todo({
-    required this.id,
+    this.id,
     required this.text,
     this.isCompleted = false,
   });
 
-  final String id;
+  final String? id;
 
   final String text;
 
@@ -34,5 +34,5 @@ class Todo extends Equatable {
   Map<String, dynamic> toJson() => _$TodoToJson(this);
 
   @override
-  List<Object> get props => [id, text, isCompleted];
+  List<Object?> get props => [id, text, isCompleted];
 }
