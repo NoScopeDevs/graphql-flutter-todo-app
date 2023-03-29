@@ -2,6 +2,7 @@ package store
 
 import (
 	"context"
+	"errors"
 	"go-graphql-server/graph/model"
 	"net/http"
 
@@ -9,62 +10,60 @@ import (
 )
 
 type Store struct {
-	Todos []*model.Todo
+	Todos map[string]*model.Todo
 }
 
 func NewStore() *Store {
-	store := make([]*model.Todo, 0)
+	store := make(map[string]*model.Todo)
 	return &Store{
 		Todos: store,
 	}
 }
 
-// AddTodo - add todo to store
-func (s *Store) AddTodo(t *model.NewTodo) (*model.Todo, error) {
-	uuid, err := uuid.NewRandom()
-	if err != nil {
-		return nil, err
+// SaveTodo - saves or updates todo in store
+func (s *Store) SaveTodo(input *model.TodoInput) (*model.Todo, error) {
+	var id string
+	var isCompleted bool
+	if input.ID == nil {
+		uuid, err := uuid.NewRandom()
+		id = uuid.String()
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		id = *input.ID
+	}
+
+	if input.IsCompleted == nil {
+		isCompleted = false
+	} else {
+		isCompleted = *input.IsCompleted
 	}
 
 	todo := &model.Todo{
-		ID:   uuid.String(),
-		Text: t.Text,
-		Done: false,
+		ID:          id,
+		Text:        input.Text,
+		IsCompleted: isCompleted,
 	}
 
-	s.Todos = append(s.Todos, todo)
+	s.Todos[id] = todo
 
 	return todo, nil
 }
 
 // DeleteTodo - delete todo from store
 func (s *Store) DeleteTodo(id string) (*model.Todo, error) {
-	var todo *model.Todo
 
-	for i, t := range s.Todos {
-		if t.ID == id {
-			todo = t
-			s.Todos = append(s.Todos[:i], s.Todos[i+1:]...)
-			break
-		}
+	todo := s.Todos[id]
+
+	if todo != nil {
+		delete(s.Todos, id)
+		return todo, nil
 	}
 
-	return todo, nil
-}
+	// return error not found
+	return nil, errors.New("Todo not found")
 
-// ToggleTodoDone - toggle todo done
-func (s *Store) ToggleTodoDone(id string) (*model.Todo, error) {
-	var todo *model.Todo
-
-	for _, t := range s.Todos {
-		if t.ID == id {
-			todo = t
-			todo.Done = !todo.Done
-			break
-		}
-	}
-
-	return todo, nil
 }
 
 type StoreKeyType string

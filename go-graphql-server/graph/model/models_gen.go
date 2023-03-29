@@ -2,12 +2,14 @@
 
 package model
 
-type NewTodo struct {
-	Text string `json:"text"`
+type Todo struct {
+	ID          string `json:"id"`
+	Text        string `json:"text"`
+	IsCompleted bool   `json:"isCompleted"`
 }
 
-type Todo struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
+type TodoInput struct {
+	ID          *string `json:"id,omitempty"`
+	Text        string  `json:"text"`
+	IsCompleted *bool   `json:"isCompleted,omitempty"`
 }

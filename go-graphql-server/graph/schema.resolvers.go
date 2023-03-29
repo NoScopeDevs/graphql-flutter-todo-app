@@ -8,13 +8,15 @@ import (
 	"context"
 	"go-graphql-server/graph/model"
 	"go-graphql-server/graph/store"
+
+	"golang.org/x/exp/maps"
 )
 
-// CreateTodo is the resolver for the createTodo field.
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
+// SaveTodo is the resolver for the saveTodo field.
+func (r *mutationResolver) SaveTodo(ctx context.Context, input model.TodoInput) (*model.Todo, error) {
 	db := store.GetStoreFromContext(ctx)
 
-	todo, err := db.AddTodo(&input)
+	todo, err := db.SaveTodo(&input)
 
 	if err != nil {
 		return nil, err
@@ -36,23 +38,13 @@ func (r *mutationResolver) DeleteTodo(ctx context.Context, id string) (*model.To
 	return todo, nil
 }
 
-// ToggleTodoDone is the resolver for the toggleTodoDone field.
-func (r *mutationResolver) ToggleTodoDone(ctx context.Context, id string) (*model.Todo, error) {
-	db := store.GetStoreFromContext(ctx)
-
-	todo, err := db.ToggleTodoDone(id)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return todo, nil
-}
-
 // Todos is the resolver for the todos field.
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
 	db := store.GetStoreFromContext(ctx)
-	return db.Todos, nil
+	// extract todo list from map
+	todos := maps.Values(db.Todos)
+
+	return todos, nil
 }
 
 // Mutation returns MutationResolver implementation.
