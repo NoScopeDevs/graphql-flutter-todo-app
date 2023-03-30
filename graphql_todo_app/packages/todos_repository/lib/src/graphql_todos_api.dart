@@ -12,19 +12,21 @@ class GraphQlTodosApi extends TodosApi {
 
   @override
   Future<void> deleteTodo(String id) async {
-    final mutationString = gql('''
-          mutation deleteTodo {
-            deleteTodo(id: $id)
+    final mutationString = gql(r'''
+          mutation deleteTodoWithId($input: ID!) {
+            deleteTodo(id: $input){
+              id
+            }
           }
         ''');
 
     await _graphQLClient.mutate(
-      MutationOptions(document: mutationString),
+      MutationOptions(document: mutationString, variables: {'input': id}),
     );
   }
 
   @override
-  Future<List<Todo>> getTodos() async {
+  Future<Map<String, Todo>> getTodos() async {
     final queryString = gql('''
           query {
             todos {
@@ -50,11 +52,11 @@ class GraphQlTodosApi extends TodosApi {
       (e) => Todo.fromJson(e as Map<String, dynamic>),
     );
 
-    return todos.toList();
+    return todos.toList().asMap().map((key, t) => MapEntry(t.id!, t));
   }
 
   @override
-  Future<void> saveTodo(Todo todo) async {
+  Future<Todo> saveTodo(Todo todo) async {
     final mutationString = gql(r'''
           mutation saveTodoWithVariables($todoInput: TodoInput!) {
             saveTodo(input: $todoInput){
@@ -65,7 +67,7 @@ class GraphQlTodosApi extends TodosApi {
           }
         ''');
 
-    await _graphQLClient.mutate(
+    final result = await _graphQLClient.mutate(
       MutationOptions(
         document: mutationString,
         variables: {
@@ -73,11 +75,16 @@ class GraphQlTodosApi extends TodosApi {
         },
       ),
     );
+
+    if (result.hasException) {
+      throw result.exception!;
+    }
+
+    return Todo.fromJson(result.data!['saveTodo'] as Map<String, dynamic>);
   }
 
   @override
   Stream<List<Todo>> todosStream() {
-    // TODO: implement todosStream
     throw UnimplementedError();
   }
 }

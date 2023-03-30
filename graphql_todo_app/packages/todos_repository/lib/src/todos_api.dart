@@ -5,9 +5,9 @@ abstract class TodosApi {
 
   Stream<List<Todo>> todosStream();
 
-  Future<List<Todo>> getTodos();
+  Future<Map<String, Todo>> getTodos();
 
-  Future<void> saveTodo(Todo todo);
+  Future<Todo> saveTodo(Todo todo);
 
   Future<void> deleteTodo(String id);
 }

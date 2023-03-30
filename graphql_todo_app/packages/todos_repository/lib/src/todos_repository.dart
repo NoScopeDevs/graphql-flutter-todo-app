@@ -11,9 +11,9 @@ class TodosRepository {
 
   Stream<List<Todo>> todosStream() => _todosApi.todosStream();
 
-  Future<List<Todo>> getTodos() => _todosApi.getTodos();
+  Future<Map<String, Todo>> getTodos() => _todosApi.getTodos();
 
-  Future<void> saveTodo(Todo todo) => _todosApi.saveTodo(todo);
+  Future<Todo> saveTodo(Todo todo) => _todosApi.saveTodo(todo);
 
   Future<void> deleteTodo(String id) => _todosApi.deleteTodo(id);
 }
