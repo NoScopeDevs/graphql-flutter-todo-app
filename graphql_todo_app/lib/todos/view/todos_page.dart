@@ -32,6 +32,14 @@ class TodosView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Todo App'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              context.read<TodosBloc>().add(TodosFetched());
+            },
+          ),
+        ],
       ),
       body: BlocBuilder<TodosBloc, TodosState>(
         builder: (context, state) {
